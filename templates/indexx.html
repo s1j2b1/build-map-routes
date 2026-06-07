@@ -1,0 +1,41 @@
+
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>منظم المسارات</title>
+</head>
+<body>
+    <h1>مرحباً بك في أداة تنظيم المسارات</h1>
+    
+    <button id="generateBtn">اصنع لي المسار الأقرب</button>
+    
+    <div id="result" style="margin-top: 20px;"></div>
+
+    <script>
+        document.getElementById('generateBtn').addEventListener('click', async function() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = "جاري المعالجة... يرجى الانتظار (قد يستغرق الأمر بعض الوقت).";
+            this.disabled = true; // تعطيل الزر لمنع الضغط المتكرر
+
+            try {
+                // إرسال الطلب لخادم Flask
+                const response = await fetch('/generate', { method: 'POST' });
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    // عرض الرابط للمستخدم
+                    resultDiv.innerHTML = `<a href="${data.url}" target="_blank" style="color: blue; text-decoration: underline;">اضغط هنا لفتح مسارك المرتب في خرائط جوجل</a>`;
+                } else {
+                    resultDiv.innerHTML = `<span style="color: red;">حدث خطأ: ${data.error}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span style="color: red;">حدث خطأ في الاتصال بالسيرفر.</span>`;
+            }
+
+            this.disabled = false; // إعادة تفعيل الزر
+        });
+    </script>
+</body>
+</html>
